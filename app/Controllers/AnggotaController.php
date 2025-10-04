@@ -2,85 +2,153 @@
 
 namespace App\Controllers;
 
-use App\Models\UserModel;
 use App\Models\AnggotaModel;
 
 class AnggotaController extends BaseController
 {
+    protected $anggotaModel;
+
+    public function __construct()
+    {
+        $this->anggotaModel = new AnggotaModel();
+    }
 
     public function index()
     {
-        if (! session()->get('logged_in') || session()->get('role') !== 'admin') {
+        if (! session()->get('logged_in') || session()->get('role') !== 'Admin') {
             return redirect()->to('/login');
         }
 
-        $db = \Config\Database::connect();
-        $builder = $db->table('anggota');
-        $builder->select('anggota.anggota_id, anggota.nim, students.full_name, students.age, students.entry_year, users.username, users.email');
-        $builder->join('users', 'users.id = students.user_id'); // pastikan 'id' benar
-        $data['students'] = $builder->get()->getResultArray();
+        $seacrh = $this->request->getGet('search');
+        $data['anggota'] = $this->anggotaModel->getAnggotaWithSearch($seacrh);
 
-        return view('students/index', $data);
+        return view('anggota/index', $data);
     }
-
 
     public function create()
     {
-        return view('students/create');
+        if (! session()->get('logged_in') || session()->get('role') !== 'Admin') {
+            return redirect()->to('/login');
+        }
+        return view('anggota/create');
     }
-
+    
     public function store()
     {
-        $userModel = new \App\Models\UserModel();
-        $studentModel = new \App\Models\StudentModel();
+        if (! session()->get('logged_in') || session()->get('role') !== 'Admin') {
+            return redirect()->to('/login');
+        }
 
-        // Simpan data user dulu
-        $userData = [
-            'username' => $this->request->getPost('username'),
-            'email'    => $this->request->getPost('email'),
-            'password' => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
-            'role'     => 'student'
-        ];
-        $userModel->save($userData);
-        $userId = $userModel->getInsertID();
-
-        // Simpan data student (link ke user_id)
-        $studentModel->save([
-            'user_id'    => $userId,
-            'nim'        => $this->request->getPost('nim'),
-            'full_name'  => $this->request->getPost('full_name'),
-            'age'        => $this->request->getPost('age'),
-            'entry_year' => $this->request->getPost('entry_year'),
+        $validation = \Config\Services::validation();
+        $validation->setRules([
+            'nama_depan' => 'required',
+            'nama_belakang' => 'required',
+            'jabatan' => 'required|in_list[Ketua,Wakil Ketua,Anggota]',
+            'status_pernikahan' => 'required|in_list[Kawin,Belum Kawin]',
+            'jumlah_anak' => 'required|integer|greater_than_equal_to[0]'
         ]);
 
-        return redirect()->to('/students')->with('success', 'Mahasiswa berhasil ditambahkan!');
-    }
+        if (! $validation->withRequest($this->request)->run()) {
+            return redirect()->back()->withInput()->with('errors', $validation->getErrors());
+        }
 
+        $this->anggotaModel->save([
+            'gelar_depan' => $this->request->getPost('gelar_depan'),
+            'nama_depan' => $this->request->getPost('nama_depan'),
+            'nama_belakang' => $this->request->getPost('nama_belakang'),
+            'gelar_belakang' => $this->request->getPost('gelar_belakang'),
+            'jabatan' => $this->request->getPost('jabatan'),
+            'status_pernikahan' => $this->request->getPost('status_pernikahan'),
+            'jumlah_anak' => $this->request->getPost('jumlah_anak')
+        ]);
+
+        return redirect()->to('/anggota')->with('success', 'Data anggota berhasil ditambahkan!');
+    }
 
     public function edit($id)
     {
-        $studentModel = new StudentModel();
-        $data['student'] = $studentModel->find($id);
-        return view('students/edit', $data);
+        if (! session()->get('logged_in') || session()->get('role') !== 'Admin') {
+            return redirect()->to('/login');
+        }
+
+        $data['anggota'] = $this->anggotaModel->find($id);
+        if (! $data['anggota']) {
+            return redirect()->to('/anggota')->with('error', 'Data anggota tidak ditemukan!');
+        }
+
+        return view('anggota/edit', $data);
     }
 
     public function update($id)
     {
-        $studentModel = new StudentModel();
-        $studentModel->update($id, [
-            'nim'        => $this->request->getPost('nim'),
-            'full_name'  => $this->request->getPost('full_name'),
-            'age'        => $this->request->getPost('age'),
-            'entry_year' => $this->request->getPost('entry_year'),
+        if (! session()->get('logged_in') || session()->get('role') !== 'Admin') {
+            return redirect()->to('/login');
+        }
+
+        $anggota = $this->anggotaModel->find($id);
+        if (!$anggota) {
+            return redirect()->to('/anggota')->with('error', 'Data anggota tidak ditemukan!');
+        }
+
+        $validation = \Config\Services::validation();
+        $validation->setRules([
+            'nama_depan' => 'required',
+            'nama_belakang' => 'required',
+            'jabatan' => 'required|in_list[Ketua,Wakil Ketua,Anggota]',
+            'status_pernikahan' => 'required|in_list[Kawin,Belum Kawin]',
+            'jumlah_anak' => 'required|integer|greater_than_equal_to[0]'
         ]);
-        return redirect()->to('/students')->with('success', 'Student berhasil diperbarui!');
+
+        if (! $validation->withRequest($this->request)->run()) {
+            return redirect()->back()->withInput()->with('errors', $validation->getErrors());
+        }
+
+        $this->anggotaModel->update($id, [
+            'gelar_depan' => $this->request->getPost('gelar_depan'),
+            'nama_depan' => $this->request->getPost('nama_depan'),
+            'nama_belakang' => $this->request->getPost('nama_belakang'),
+            'gelar_belakang' => $this->request->getPost('gelar_belakang'),
+            'jabatan' => $this->request->getPost('jabatan'),
+            'status_pernikahan' => $this->request->getPost('status_pernikahan'),
+            'jumlah_anak' => $this->request->getPost('jumlah_anak')
+        ]);
+
+        return redirect()->to('/anggota')->with('success', 'Data anggota berhasil diperbarui!');
     }
 
     public function delete($id)
     {
-        $studentModel = new StudentModel();
-        $studentModel->delete($id);
-        return redirect()->to('/students')->with('success', 'Student berhasil dihapus!');
+        if (! session()->get('logged_in') || session()->get('role') !== 'Admin') {
+            return redirect()->to('/login');
+        }
+
+        // Cek apakah ID valid
+        log_message('error', 'ID yang diterima di deleter:' . $id);
+        if (!$id || !is_numeric($id) || $id == 0) {
+            return redirect()->to('/anggota')->with('error', 'ID tidak valid!');
+        }
+        
+        
+        
+        $anggota = $this->anggotaModel->find($id);
+        if (!$anggota) {
+            log_message('error', 'Data dengan ID ' . $id . ' tidak ditemukan');
+            return redirect()->to('/anggota')->with('error', 'Data anggota tidak ditemukan!');
+        }
+
+        $result = $this->anggotaModel->delete($id);
+        $this->anggotaModel->delete($id);
+        return redirect()->to('/anggota')->with('success', 'Data anggota berhasil dihapus!');
     }
+
+    public function publicIndex()
+    {
+        if (!session()->get('logged_in') || session()->get('role') !== 'Public') {
+            return redirect()->to('/login');
+        }
+        $data['anggota'] = $this->anggotaModel->findAll(); // Ambil semua data
+        return view('public/anggota', $data);
+    }
+
 }
 
