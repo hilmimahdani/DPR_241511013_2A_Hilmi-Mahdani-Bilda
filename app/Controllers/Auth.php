@@ -1,8 +1,6 @@
 <?php
-
 namespace App\Controllers;
-
-use App\Models\UserModel;
+use App\Models\PenggunaModel;
 
 class Auth extends BaseController
 {
@@ -24,12 +22,16 @@ class Auth extends BaseController
         if ($user) {
             if (password_verify($password, $user['password'])) {
                 $session->set([
-                    'user_id'   => $user['id'],
+                    'id_pengguna'   => $user['id_pengguna'],
                     'username'  => $user['username'],
-                    'role'      => $user['role'], // simpan role
+                    'role'      => $user['role'], 
                     'logged_in' => true
                 ]);
-                return redirect()->to(base_url('home'));
+                if ($user['role'] === 'Admin') {
+                    return redirect()->to(base_url('home'))->with('success', 'Login berhasil sebagai Admin!');
+                } else {
+                    return redirect()->to(base_url('public/anggota'))->with('success', 'Login berhasil sebagai Public!');
+                }
             } else {
                 $session->setFlashdata('error', 'Password salah!');
                 return redirect()->to(base_url('login'));
@@ -40,6 +42,12 @@ class Auth extends BaseController
         }
     }
 
+    public function logout()
+    {
+        session()->destroy();
+        return redirect()->to(base_url('login'))->with('success', 'Logout berhasil!');
+    }
+
     public function register()
     {
         return view('auth/register');
@@ -47,22 +55,18 @@ class Auth extends BaseController
 
     public function doRegister()
     {
-        $model = new UserModel();
+        $model = new PenggunaModel();
 
         $data = [
             'username' => $this->request->getPost('username'),
-            'email'    => $this->request->getPost('email'),
+            'email' => $this->request->getPost('email'),
             'password' => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
-            'role'     => $this->request->getPost('role') ?? 'student'
+            'nama_depan' => $this->request->getPost('nama_depan'),
+            'nama_belakang' => $this->request->getPost('nama_belakang'),
+            'role' => $this->request->getPost('role') ?? 'Public'
         ];
 
         $model->save($data);
         return redirect()->to(base_url('login'))->with('success', 'Register berhasil, silakan login!');
-    }
-
-    public function logout()
-    {
-        session()->destroy();
-        return redirect()->to(base_url('login'));
     }
 }
