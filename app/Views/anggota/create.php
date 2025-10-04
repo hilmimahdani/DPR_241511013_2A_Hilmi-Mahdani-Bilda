@@ -13,39 +13,41 @@
         </div>
         <div class="card-body">
             <form method="post" action="<?= base_url('anggota/store') ?>">
-                <h5 class="text-primary">🔑 Akun User</h5>
-                <div class="mb-3">
-                    <label>Username</label>
-                    <input type="text" name="username" class="form-control" required>
-                </div>
-                <div class="mb-3">
-                    <label>Email</label>
-                    <input type="email" name="email" class="form-control" required>
-                </div>
-                <div class="mb-3">
-                    <label>Password</label>
-                    <input type="password" name="password" class="form-control" required>
-                </div>
 
                 <hr>
-                <h5 class="text-primary">📋 Identitas Mahasiswa</h5>
+                <h5 class="text-primary">📋 Identitas Anggota</h5>
+                <!-- <div class="mb-3">
+                    <label>ID Anggota</label>
+                    <input type="number" name="id_anggota" class="form-control" required>
+                </div> -->
                 <div class="mb-3">
-                    <label>NIM</label>
-                    <input type="text" name="nim" class="form-control" required>
+                    <label>Gelar Depan</label>
+                    <input type="text" name="gelar_depan" class="form-control" required>
                 </div>
                 <div class="mb-3">
-                    <label>Nama Lengkap</label>
-                    <input type="text" name="full_name" class="form-control" required>
+                    <label>Nama Depan</label>
+                    <input type="text" name="nama_depan" class="form-control" required>
                 </div>
                 <div class="mb-3">
-                    <label>Usia</label>
-                    <input type="number" name="age" class="form-control" required>
+                    <label>Nama Belakang</label>
+                    <input type="text" name="nama_belakang" class="form-control" required>
                 </div>
                 <div class="mb-3">
-                    <label>Entry Year</label>
-                    <input type="number" name="entry_year" class="form-control" required>
+                    <label>Gelar Belakang</label>
+                    <input type="text" name="gelar_belakang" class="form-control" required>
                 </div>
-
+                <div class="mb-3">
+                    <label>Jabatan</label>
+                    <input type="text" name="jabatan" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label>Status Pernikahan</label>
+                    <input type="text" name="status_pernikahan" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label>Jumlah Anak</label>
+                    <input type="number" name="jumlah_anak" class="form-control" required>
+                </div>
                 <button type="submit" class="btn btn-primary">Simpan</button>
                 <a href="<?= base_url('anggota') ?>" class="btn btn-secondary">Batal</a>
             </form>
