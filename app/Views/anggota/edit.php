@@ -14,24 +14,20 @@
         <div class="card-body">
             <form method="post" action="<?= base_url('anggota/update/'.$anggota['id_anggota']) ?>">
                 <div class="mb-3">
-                    <label>ID Anggota</label>
-                    <input type="number" name="id_anggota" class="form-control" value="<?= esc($anggota['id_anggota']) ?>" required>
-                </div>
-                <div class="mb-3">
-                    <label>Nama Depan Anggota</label>
-                    <input type="text" name="nama_depan" class="form-control" value="<?= esc($anggota['nama_depan']) ?>" required>
-                </div>
-                <div class="mb-3">
-                    <label>Nama Belakang Anggota</label>
-                    <input type="text" name="nama_belakang" class="form-control" value="<?= esc($anggota['nama_belakang']) ?>" required>
-                </div>
-                <div class="mb-3">
                     <label>Gelar Depan</label>
                     <input type="text" name="gelar_depan" class="form-control" value="<?= esc($anggota['gelar_depan']) ?>" required>
                 </div>
                 <div class="mb-3">
+                    <label>Nama Depan</label>
+                    <input type="text" name="nama_depan" class="form-control" value="<?= esc($anggota['nama_depan']) ?>" required>
+                </div>
+                <div class="mb-3">
+                    <label>Nama Belakang</label>
+                    <input type="text" name="nama_belakang" class="form-control" value="<?= esc($anggota['nama_belakang']) ?>" required>
+                </div>
+                <div class="mb-3">
                     <label>Gelar Belakang</label>
-                    <input type="text" name="gelar_belakang" class="form-control" value="<?= esc($anggota['gelar_depan']) ?>" required>
+                    <input type="text" name="gelar_belakang" class="form-control" value="<?= esc($anggota['gelar_belakang']) ?>" required>
                 </div>
                 <div class="mb-3">
                     <label>Jabatan</label>
@@ -40,6 +36,10 @@
                 <div class="mb-3">
                     <label>Status Pernikahan</label>
                     <input type="text" name="status_pernikahan" class="form-control" value="<?= esc($anggota['status_pernikahan']) ?>" required>
+                </div>
+                <div class="mb-3">
+                    <label>Jumlah Anak</label>
+                    <input type="number" name="jumlah_anak" class="form-control" value="<?= esc($anggota['jumlah_anak']) ?>" required>
                 </div>
                 <button type="submit" class="btn btn-primary">Update</button>
                 <a href="<?= base_url('anggota') ?>" class="btn btn-secondary">Batal</a>
